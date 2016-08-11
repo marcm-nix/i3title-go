@@ -1,27 +1,22 @@
 package main
 
 import (
-_    "fmt"
 	"github.com/samuelotter/i3ipc"
 )
 
-
-//var ipcsocket i3ipc.IPCSocket
-
-
-func run() {
-
+func Run() {
 
 	channel := make(chan i3ipc.Event)
-	//subscribeTo(i3ipc.I3WorkspaceEvent, channel)
+
+    socket, _ := i3ipc.GetIPCSocket()
+
+    GetCurrent(socket)
+
+    subscribeTo(i3ipc.I3WorkspaceEvent, channel)
 	subscribeTo(i3ipc.I3WindowEvent, channel)
 
-//    ips, _ := i3ipc.GetIPCSocket()
-
 	for event := range channel {
-        eventHandler(event)
-        handleEvent()
-        //fmt.Printf("%s", a)
+        eventHandler(event, socket)
 	}
 }
 

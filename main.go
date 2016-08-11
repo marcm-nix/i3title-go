@@ -13,5 +13,5 @@ func init() {
 func main() {
 	flag.Parse()
 
-    run()
+    Run()
 }
