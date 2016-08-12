@@ -57,25 +57,35 @@ func eventHandler(event i3ipc.Event, socket *i3ipc.IPCSocket) {
 
     if event.Change == "focus" || event.Change == "title" {
 
-
         jsonString, _ := json.Marshal(event.Payload)
         var parsedWindowEvent = &ParsedWindowEvent{}
         json.Unmarshal([]byte(jsonString), &parsedWindowEvent)
 
-        fmt.Printf(format, parsedWindowEvent.Container.WindowProperties.Title)
+        title := parsedWindowEvent.Container.WindowProperties.Title
+
+        if event.Change == "focus" && title == ""{
+            return
+        }
+
+        fmt.Printf(format, title)
 
         return
     }
 
+    return
 
 
-    fmt.Printf("change:%s\n\n", event.Change)
+    // if event.Change == "move" {
+    //
+    //     fmt.Printf("change:%s\n\n", event)
+    // }
 
 
 }
 
 
 func iterateNodes(tree []i3ipc.I3Node, channel chan string) {
+
 
     for _, t := range tree {
 
@@ -89,6 +99,7 @@ func iterateNodes(tree []i3ipc.I3Node, channel chan string) {
         }
 
     }
+    return
 }
 
 
@@ -103,21 +114,23 @@ func GetCurrent(socket *i3ipc.IPCSocket) {
         return
     }
 
-    // if tree.Focused == true {
-    //     //fmt.Println(tree.Name)
-    //     return
-    // }
+    if tree.Focused == true {
+        fmt.Println(tree.Name)
+        return
+    }
 
     ch := make(chan string)
 
-    for _, t := range tree.Nodes {
+    go func() {
+        for _, t := range tree.Nodes {
 
-        if t.Layout == output || output == "all" {
-            go iterateNodes(t.Nodes, ch)
+            if t.Layout == output || output == "all" {
+                iterateNodes(t.Nodes, ch)
+            }
         }
-    }
-    title := <-ch
-    fmt.Printf(format, title)
+        close(ch)
+    }()
+    fmt.Printf(format, <-ch)
 
     return
 }

@@ -10,7 +10,7 @@ func Run() {
 
     socket, _ := i3ipc.GetIPCSocket()
 
-    GetCurrent(socket)
+    //GetCurrent(socket)
 
     subscribeTo(i3ipc.I3WorkspaceEvent, channel)
 	subscribeTo(i3ipc.I3WindowEvent, channel)
